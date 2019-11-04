@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using zero-to-pipeline.Models;
+using ZeroToPipeline.Models;
 
-namespace zero-to-pipeline.Controllers
+namespace ZeroToPipeline.Controllers
 {
     public class HomeController : Controller
     {

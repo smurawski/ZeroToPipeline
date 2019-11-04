@@ -10,4 +10,4 @@ COPY . /app
 ENV ASPNETCORE_URLS=http://*:
 
 # Start the app
-ENTRYPOINT dotnet zero-to-pipeline.dll
+ENTRYPOINT dotnet ZeroToPipeline.dll

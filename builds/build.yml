@@ -1,0 +1,103 @@
+variables:
+  BuildPlatform: 'any cpu'
+  BuildConfiguration: release
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  NUGET_XMLDOC_MODE: 'skip'
+  baseName: 'ZeroToPipeline'
+  baseUniqueId: '1234abc0'
+  aiLocation: 'South Central US'
+
+trigger:
+  - master
+
+pool:
+  name: Hosted Ubuntu 1604
+  demands: npm
+
+stages:
+  - stage: Build
+    jobs:
+      - job:
+        steps:
+          - task: Npm@0
+            displayName: 'Install bower'
+            inputs:
+              arguments: 'bower --allow-root'
+
+          - script: |
+              bower install --allow-root
+            workingDirectory: 'src/ZeroToPipeline'
+            displayName: 'Run bower'
+
+          - task: DotNetCoreInstaller@0
+            displayName: 'Use .NET Core SDK 2.0.0'
+            inputs:
+              version: 2.0.0
+
+          - task: DotNetCoreCLI@2
+            displayName: Restore
+            inputs:
+              command: restore
+              projects: '*.sln'
+
+          - task: DotNetCoreCLI@2
+            displayName: Test
+            inputs:
+              command: test
+              projects: '**/*.Tests.csproj'
+              arguments: '-l trx'
+              publishTestResults: false
+
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            inputs:
+              testResultsFormat: VSTest
+              testResultsFiles: '**/*.trx'
+              testRunTitle: Unit
+              buildPlatform: '$(BuildPlatform)'
+              buildConfiguration: '$(BuildConfiguration)'
+              publishRunAttachments: false
+            condition: succeededOrFailed()
+
+          - task: DotNetCoreCLI@2
+            displayName: Publish
+            inputs:
+              command: publish
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.StagingDirectory)/pub'
+
+          - task: CopyFiles@2
+            displayName: 'Copy ARM template files to publish folder'
+            inputs:
+              SourceFolder: templates/
+              Contents: '**/*.json'
+              TargetFolder: '$(Build.StagingDirectory)/pub/templates/'
+              OverWrite: true
+
+          - publish: '$(Build.StagingDirectory)/pub'
+            artifact: drop
+
+  - stage: Deployment
+    jobs:
+      - job: DeployDev
+        displayName: Deploy Dev Environment
+        variables:
+          DeploymentEnvironment: dev
+        steps:
+          - download: current
+            artifact: drop
+          - task: AzureResourceGroupDeployment@2
+            displayName: 'Azure Deployment:Create Or Update Resource Group action on ZeroToPipeline'
+            inputs:
+              azureSubscription: 'ca-stmuraws-demo-test'
+              resourceGroupName: '$(baseName)$(DeploymentEnvironment)'
+              location: 'Central US'
+              csmFile: '$(Pipeline.Workspace)/drop/templates/website.json'
+              csmParametersFile: '$(Pipeline.Workspace)/drop/templates/website.parameters.json'
+              overrideParameters: '-hostingPlanName $(baseName)$(DeploymentEnvironment) -webSiteName $(baseName)$(DeploymentEnvironment)$(baseUniqueId) -aiLocation "$(aiLocation)"'
+          - task: AzureCLI@2
+            displayName: Deploy Dev Website
+            inputs:
+              azureSubscription: 'ca-stmuraws-demo-test'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: 'az webapp deployment source config-zip -g $(baseName)$(DeploymentEnvironment) -n $(baseName)$(DeploymentEnvironment)$(baseUniqueId) --src $(Pipeline.Workspace)/drop/ZeroToPipeline.zip'

@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using zero-to-pipeline.Controllers;
+using ZeroToPipeline.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
-namespace zero-to-pipeline.Tests
+namespace ZeroToPipeline.Tests
 {
     // see example explanation on xUnit.net website:
     // https://xunit.github.io/docs/getting-started-dotnet-core.html

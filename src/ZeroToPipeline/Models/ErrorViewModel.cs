@@ -1,6 +1,6 @@
 using System;
 
-namespace zero-to-pipeline.Models
+namespace ZeroToPipeline.Models
 {
     public class ErrorViewModel
     {

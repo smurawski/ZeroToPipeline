@@ -1,0 +1,14 @@
+  {
+  "extensions": [
+    "ms-vscode.csharp",
+    "johnpapa.vscode-peacock"
+  ],
+
+  // Set remote color for Peacock
+  "settings": {
+    "peacock.remoteColor": "#0078D7"
+  },
+
+  // Use the dockerfile in .devcontainer directory
+  "dockerfile": "Dockerfile"
+}
