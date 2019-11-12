@@ -2,6 +2,8 @@
 
 [Get started in VS Online](https://online.visualstudio.com/environments/new?name=ZeroToPipeline&repo=https://github.com/smurawski/ZeroToPipeline)
 
+[Video from Microsoft Ignite 2019](https://myignite.techcommunity.microsoft.com/sessions/84116)
+
 ## Build and Deployment:
 
 * [Build, Test, and Deploy .NET Core apps](https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/dotnet-core?WT.mc_id=msignite2019-github-stmuraws&view=azure-devops)
